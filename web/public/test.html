@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API测试</title>
+</head>
+<body>
+    <h1>列车查询API测试</h1>
+    <button onclick="testAPI()">测试查询</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            try {
+                // 测试查询北京到昆明
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        startStation: '北京',
+                        endStation: '昆明'
+                    })
+                });
+                
+                const result = await response.json();
+                document.getElementById('result').innerHTML = '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+                console.log('查询结果:', result);
+            } catch (error) {
+                console.error('查询错误:', error);
+                document.getElementById('result').innerHTML = '查询失败: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

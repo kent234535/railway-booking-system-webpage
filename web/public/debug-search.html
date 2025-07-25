@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索测试 - 调试版</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .result { margin: 10px 0; padding: 10px; border: 1px solid #ddd; }
+        .debug { background: #f5f5f5; padding: 10px; margin: 10px 0; }
+        pre { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>车票搜索调试测试</h1>
+    
+    <div>
+        <label>出发站：</label>
+        <input type="text" id="startStation" value="北京" placeholder="出发站">
+    </div>
+    <div>
+        <label>到达站：</label>
+        <input type="text" id="endStation" value="上海" placeholder="到达站">
+    </div>
+    <div>
+        <label>出发时间：</label>
+        <input type="time" id="departureTime" placeholder="可选">
+    </div>
+    
+    <button onclick="testSearch()">搜索列车</button>
+    <button onclick="clearResults()">清空结果</button>
+    
+    <div id="debug" class="debug">
+        <h3>调试信息</h3>
+        <div id="debugInfo">点击搜索开始测试...</div>
+    </div>
+    
+    <div id="results">
+        <h3>搜索结果</h3>
+        <div id="resultsList"></div>
+    </div>
+    
+    <script>
+        function addDebugInfo(message) {
+            const debugDiv = document.getElementById('debugInfo');
+            debugDiv.innerHTML += '<p>' + new Date().toLocaleTimeString() + ': ' + message + '</p>';
+        }
+        
+        function clearResults() {
+            document.getElementById('debugInfo').innerHTML = '已清空结果...';
+            document.getElementById('resultsList').innerHTML = '';
+        }
+        
+        async function testSearch() {
+            const startStation = document.getElementById('startStation').value;
+            const endStation = document.getElementById('endStation').value;
+            const departureTime = document.getElementById('departureTime').value;
+            
+            addDebugInfo(`开始搜索: ${startStation} -> ${endStation} (时间: ${departureTime || '无限制'})`);
+            
+            try {
+                addDebugInfo('发送请求到 /api/search...');
+                
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        startStation,
+                        endStation,
+                        departureTime
+                    }),
+                });
+                
+                addDebugInfo(`服务器响应状态: ${response.status} ${response.statusText}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP错误! 状态: ${response.status}`);
+                }
+                
+                const results = await response.json();
+                addDebugInfo(`成功获取数据，结果数量: ${results.length}`);
+                addDebugInfo('原始数据: ' + JSON.stringify(results, null, 2));
+                
+                displayResults(results);
+                
+            } catch (error) {
+                addDebugInfo(`错误: ${error.message}`);
+                console.error('搜索错误:', error);
+            }
+        }
+        
+        function displayResults(results) {
+            const resultsList = document.getElementById('resultsList');
+            
+            if (results.length === 0) {
+                resultsList.innerHTML = '<p>没有找到匹配的列车</p>';
+                return;
+            }
+            
+            let html = '<table border="1" style="width: 100%; border-collapse: collapse;">';
+            html += '<tr><th>车次</th><th>出发站</th><th>到达站</th><th>出发时间</th><th>到达时间</th><th>历时</th><th>余票</th><th>票价</th></tr>';
+            
+            results.forEach((train, index) => {
+                addDebugInfo(`处理车次 ${index + 1}: ${JSON.stringify(train)}`);
+                
+                // 计算历时
+                let duration = '未知';
+                if (train.departureTime && train.arrivalTime && train.departureTime !== '未知' && train.arrivalTime !== '未知') {
+                    const depTime = train.departureTime.split(':');
+                    const arrTime = train.arrivalTime.split(':');
+                    const depMinutes = parseInt(depTime[0]) * 60 + parseInt(depTime[1]);
+                    let arrMinutes = parseInt(arrTime[0]) * 60 + parseInt(arrTime[1]);
+                    
+                    if (arrMinutes < depMinutes) {
+                        arrMinutes += 24 * 60; // 跨天
+                    }
+                    
+                    const durationMinutes = arrMinutes - depMinutes;
+                    const hours = Math.floor(durationMinutes / 60);
+                    const minutes = durationMinutes % 60;
+                    duration = `${hours}小时${minutes}分钟`;
+                }
+                
+                html += `<tr>
+                    <td>${train.trainNumber || '未知'}</td>
+                    <td>${train.startStation || '未知'}</td>
+                    <td>${train.endStation || '未知'}</td>
+                    <td>${train.departureTime || '未知'}</td>
+                    <td>${train.arrivalTime || '未知'}</td>
+                    <td>${duration}</td>
+                    <td>${train.availableSeats !== undefined ? train.availableSeats : '未知'}</td>
+                    <td>¥${train.price !== undefined ? train.price : '未知'}</td>
+                </tr>`;
+            });
+            
+            html += '</table>';
+            resultsList.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

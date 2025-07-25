@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试列车管理 API</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .test-section { 
+            margin: 20px 0; 
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+        }
+        .test-section h3 { 
+            margin-top: 0; 
+            color: #333; 
+        }
+        .result { 
+            background: #f8f9fa; 
+            border: 1px solid #e9ecef; 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 4px; 
+            white-space: pre-wrap; 
+            font-family: monospace; 
+            max-height: 300px; 
+            overflow-y: auto; 
+        }
+        button { 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 8px 16px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px; 
+        }
+        button:hover { background: #0056b3; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .status-normal { color: green; font-weight: bold; }
+        .status-suspended { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚄 列车管理 API 测试</h1>
+        
+        <div class="test-section">
+            <h3>1. 测试 /api/trains 接口</h3>
+            <button onclick="testTrainsAPI()">获取所有列车</button>
+            <div id="trains-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. 测试 /api/admin/suspended-trains 接口</h3>
+            <button onclick="testSuspendedTrainsAPI()">获取停运列车</button>
+            <div id="suspended-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. 模拟列车管理加载</h3>
+            <button onclick="simulateLoadTrainManagement()">加载列车管理</button>
+            <div id="management-result" class="result"></div>
+            <div id="train-table-container"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. 测试停运/恢复操作</h3>
+            <input type="text" id="train-number" placeholder="输入车次号 (如: G123)" style="padding: 8px; margin: 5px;">
+            <button onclick="testSuspendTrain()">停运列车</button>
+            <button onclick="testResumeTrain()">恢复列车</button>
+            <div id="operation-result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // 测试 /api/trains 接口
+        async function testTrainsAPI() {
+            const resultDiv = document.getElementById('trains-result');
+            try {
+                const response = await fetch('/api/trains');
+                const data = await response.json();
+                
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `状态: ${response.status} ${response.statusText}\n\n` +
+                    `响应格式: ${JSON.stringify(data, null, 2)}`;
+                
+                if (data.success && data.trains) {
+                    resultDiv.textContent += `\n\n列车数量: ${data.trains.length}`;
+                    if (data.trains.length > 0) {
+                        resultDiv.textContent += `\n第一个列车: ${JSON.stringify(data.trains[0], null, 2)}`;
+                    }
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `错误: ${error.message}`;
+            }
+        }
+
+        // 测试 /api/admin/suspended-trains 接口
+        async function testSuspendedTrainsAPI() {
+            const resultDiv = document.getElementById('suspended-result');
+            try {
+                const response = await fetch('/api/admin/suspended-trains');
+                const data = await response.json();
+                
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `状态: ${response.status} ${response.statusText}\n\n` +
+                    `响应格式: ${JSON.stringify(data, null, 2)}`;
+                
+                if (data.success && data.trains) {
+                    resultDiv.textContent += `\n\n停运列车数量: ${data.trains.length}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `错误: ${error.message}`;
+            }
+        }
+
+        // 模拟列车管理加载 (使用修复后的逻辑)
+        async function simulateLoadTrainManagement() {
+            const resultDiv = document.getElementById('management-result');
+            const tableContainer = document.getElementById('train-table-container');
+            
+            try {
+                resultDiv.className = 'result';
+                resultDiv.textContent = '正在加载列车管理数据...';
+                
+                const [trainsResponse, suspendedResponse] = await Promise.all([
+                    fetch('/api/trains'),
+                    fetch('/api/admin/suspended-trains')
+                ]);
+                
+                const trainsData = await trainsResponse.json();
+                const suspendedData = await suspendedResponse.json();
+                
+                // 检查API响应格式 - 修正后的逻辑
+                const trains = trainsData.success ? trainsData.trains : [];
+                const suspended = suspendedData.success ? suspendedData.trains : [];
+                
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `加载成功!\n\n` +
+                    `列车数据: ${JSON.stringify(trainsData, null, 2)}\n\n` +
+                    `停运数据: ${JSON.stringify(suspendedData, null, 2)}\n\n` +
+                    `处理后的列车: ${trains.length} 个\n` +
+                    `停运列车: ${suspended.length} 个`;
+                
+                // 创建显示列车列表
+                const displayTrains = trains.map(train => {
+                    const isRunning = !suspended.includes(train.trainNumber);
+                    
+                    return {
+                        trainNumber: train.trainNumber,
+                        route: `${train.stations[0]} → ${train.stations[train.stations.length - 1]}`,
+                        isRunning
+                    };
+                });
+                
+                // 生成表格
+                tableContainer.innerHTML = `
+                    <h4>列车管理表格 (${displayTrains.length} 个列车)</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>车次</th>
+                                <th>路线</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${displayTrains.map(train => `
+                                <tr>
+                                    <td><strong>${train.trainNumber}</strong></td>
+                                    <td>${train.route}</td>
+                                    <td>
+                                        <span class="${train.isRunning ? 'status-normal' : 'status-suspended'}">
+                                            ${train.isRunning ? '正常运行' : '已停运'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        ${train.isRunning ? 
+                                            `<button onclick="testSuspendTrainByNumber('${train.trainNumber}')">停运</button>` :
+                                            `<button onclick="testResumeTrainByNumber('${train.trainNumber}')">恢复</button>`
+                                        }
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `加载失败: ${error.message}`;
+                tableContainer.innerHTML = '';
+            }
+        }
+
+        // 测试停运列车
+        async function testSuspendTrain() {
+            const trainNumber = document.getElementById('train-number').value;
+            if (!trainNumber) {
+                alert('请输入车次号');
+                return;
+            }
+            await testSuspendTrainByNumber(trainNumber);
+        }
+
+        async function testSuspendTrainByNumber(trainNumber) {
+            const resultDiv = document.getElementById('operation-result');
+            try {
+                const response = await fetch('/api/admin/suspend-train', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ trainNumber }),
+                });
+                
+                const result = await response.json();
+                
+                resultDiv.className = result.success ? 'result success' : 'result error';
+                resultDiv.textContent = `停运 ${trainNumber}:\n${JSON.stringify(result, null, 2)}`;
+                
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `停运操作失败: ${error.message}`;
+            }
+        }
+
+        // 测试恢复列车
+        async function testResumeTrain() {
+            const trainNumber = document.getElementById('train-number').value;
+            if (!trainNumber) {
+                alert('请输入车次号');
+                return;
+            }
+            await testResumeTrainByNumber(trainNumber);
+        }
+
+        async function testResumeTrainByNumber(trainNumber) {
+            const resultDiv = document.getElementById('operation-result');
+            try {
+                const response = await fetch('/api/admin/resume-train', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ trainNumber }),
+                });
+                
+                const result = await response.json();
+                
+                resultDiv.className = result.success ? 'result success' : 'result error';
+                resultDiv.textContent = `恢复 ${trainNumber}:\n${JSON.stringify(result, null, 2)}`;
+                
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `恢复操作失败: ${error.message}`;
+            }
+        }
+
+        // 页面加载时自动测试基本API
+        window.onload = function() {
+            testTrainsAPI();
+            testSuspendedTrainsAPI();
+        };
+    </script>
+</body>
+</html>

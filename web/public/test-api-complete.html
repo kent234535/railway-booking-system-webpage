@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>完整API测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .success { color: green; }
+        .error { color: red; }
+        .result { background: #f5f5f5; padding: 10px; margin: 10px 0; }
+        button { padding: 10px 15px; margin: 5px; }
+        input { padding: 5px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>API 完整测试页面</h1>
+
+    <div class="test-section">
+        <h2>1. 测试管理员注册</h2>
+        <input type="text" id="adminUsername" placeholder="管理员用户名" value="testadmin">
+        <input type="password" id="adminPassword" placeholder="密码" value="Admin123!">
+        <input type="text" id="adminName" placeholder="姓名" value="测试管理员">
+        <input type="text" id="adminCode" placeholder="验证码" value="ADMIN2024">
+        <button onclick="testAdminRegister()">测试管理员注册</button>
+        <div id="adminRegResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. 测试获取列车信息</h2>
+        <button onclick="testGetTrains()">测试获取列车</button>
+        <div id="trainsResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. 测试搜索车票</h2>
+        <input type="text" id="startStation" placeholder="出发站" value="北京">
+        <input type="text" id="endStation" placeholder="到达站" value="郑州">
+        <button onclick="testSearch()">测试搜索</button>
+        <div id="searchResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. 测试获取用户列表</h2>
+        <button onclick="testGetUsers()">测试获取用户</button>
+        <div id="usersResult" class="result"></div>
+    </div>
+
+    <script>
+        async function testAPI(method, url, data = null) {
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+                
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(url, options);
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                return { error: error.message };
+            }
+        }
+
+        function displayResult(elementId, title, result) {
+            const element = document.getElementById(elementId);
+            const success = result.success !== false && !result.error;
+            const className = success ? 'success' : 'error';
+            
+            element.innerHTML = `
+                <h3 class="${className}">${title}</h3>
+                <pre>${JSON.stringify(result, null, 2)}</pre>
+                <p><strong>状态:</strong> ${success ? '✅ 成功' : '❌ 失败'}</p>
+                <p><strong>success字段:</strong> ${result.hasOwnProperty('success') ? result.success : '无'}</p>
+                <p><strong>数据字段:</strong> ${Object.keys(result).filter(k => k !== 'success' && k !== 'message').join(', ') || '无'}</p>
+            `;
+        }
+
+        async function testAdminRegister() {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            const name = document.getElementById('adminName').value;
+            const adminCode = document.getElementById('adminCode').value;
+            
+            const result = await testAPI('POST', '/api/admin/register', {
+                username, password, name, adminCode
+            });
+            
+            displayResult('adminRegResult', '管理员注册结果', result);
+        }
+
+        async function testGetTrains() {
+            const result = await testAPI('GET', '/api/trains');
+            displayResult('trainsResult', '获取列车结果', result);
+        }
+
+        async function testSearch() {
+            const startStation = document.getElementById('startStation').value;
+            const endStation = document.getElementById('endStation').value;
+            
+            const result = await testAPI('POST', '/api/search', {
+                startStation, endStation
+            });
+            
+            displayResult('searchResult', '搜索车票结果', result);
+        }
+
+        async function testGetUsers() {
+            const result = await testAPI('GET', '/api/admin/users');
+            displayResult('usersResult', '获取用户列表结果', result);
+        }
+    </script>
+</body>
+</html>

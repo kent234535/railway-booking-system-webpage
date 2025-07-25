@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试API接口</title>
+</head>
+<body>
+    <h1>API接口测试</h1>
+    <button onclick="testSearch()">测试北京到上海查询</button>
+    <div id="result"></div>
+
+    <script>
+        async function testSearch() {
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        startStation: '北京', 
+                        endStation: '上海'
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('API响应:', data);
+                
+                document.getElementById('result').innerHTML = 
+                    '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                    
+            } catch (error) {
+                console.error('错误:', error);
+                document.getElementById('result').innerHTML = 
+                    '<p style="color: red;">错误: ' + error.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html>

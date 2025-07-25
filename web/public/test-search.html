@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索功能测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        select, input, button { padding: 8px; margin: 5px 0; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; cursor: pointer; }
+        .results { margin-top: 20px; border: 1px solid #ccc; padding: 15px; }
+        .train-item { border-bottom: 1px solid #eee; padding: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>列车搜索测试</h1>
+    
+    <form id="testForm">
+        <div class="form-group">
+            <label>出发站:</label>
+            <select id="startStation">
+                <option value="">请选择</option>
+                <option value="北京">北京</option>
+                <option value="昆明">昆明</option>
+                <option value="上海">上海</option>
+                <option value="广州">广州</option>
+                <option value="西安">西安</option>
+                <option value="成都">成都</option>
+                <option value="重庆">重庆</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>到达站:</label>
+            <select id="endStation">
+                <option value="">请选择</option>
+                <option value="北京">北京</option>
+                <option value="昆明">昆明</option>
+                <option value="上海">上海</option>
+                <option value="广州">广州</option>
+                <option value="西安">西安</option>
+                <option value="成都">成都</option>
+                <option value="重庆">重庆</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>出发时间（可选）:</label>
+            <input type="time" id="departureTime">
+        </div>
+        
+        <button type="submit">搜索列车</button>
+    </form>
+    
+    <div id="results" class="results" style="display: none;">
+        <h3>搜索结果:</h3>
+        <div id="resultContent"></div>
+    </div>
+    
+    <script>
+        document.getElementById('testForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const startStation = document.getElementById('startStation').value;
+            const endStation = document.getElementById('endStation').value;
+            const departureTime = document.getElementById('departureTime').value;
+            
+            if (!startStation || !endStation) {
+                alert('请选择出发站和到达站');
+                return;
+            }
+            
+            console.log('发送搜索请求:', { startStation, endStation, departureTime });
+            
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        startStation, 
+                        endStation, 
+                        departureTime
+                    }),
+                });
+                
+                const results = await response.json();
+                console.log('搜索结果:', results);
+                
+                const resultsDiv = document.getElementById('results');
+                const resultContent = document.getElementById('resultContent');
+                
+                if (results.length === 0) {
+                    resultContent.innerHTML = `<p>没有找到从 ${startStation} 到 ${endStation} 的列车</p>`;
+                } else {
+                    let html = `<p>找到 ${results.length} 个车次:</p>`;
+                    results.forEach(train => {
+                        html += `
+                            <div class="train-item">
+                                <strong>${train.trainNumber}</strong> - 
+                                ${train.startStation} → ${train.endStation}<br>
+                                出发: ${train.departureTime} | 到达: ${train.arrivalTime}<br>
+                                余票: ${train.availableSeats} | 票价: ¥${train.price}
+                            </div>
+                        `;
+                    });
+                    resultContent.innerHTML = html;
+                }
+                
+                resultsDiv.style.display = 'block';
+                
+            } catch (error) {
+                console.error('搜索出错:', error);
+                alert('搜索失败: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
