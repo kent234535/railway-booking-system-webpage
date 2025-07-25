@@ -4,7 +4,7 @@ const path = require('path');
 const Database = require('./database');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // 初始化数据库
 const db = new Database();
@@ -343,19 +343,5 @@ app.post('/api/admin/delete-user', (req, res) => {
 
 // 启动服务器
 app.listen(PORT, () => {
-    console.log(`服务器运行在 http://localhost:${PORT}`);
-    
-    // 等待一下，然后隐藏控制台
-    setTimeout(() => {
-        // 在Windows上隐藏控制台窗口
-        if (process.platform === 'win32') {
-            const { exec } = require('child_process');
-            exec('powershell -Command "Add-Type -Name ConsoleUtils -Namespace Win32 -MemberDefinition \'[DllImport(\\\"user32.dll\\\")]public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);\'; $consolePtr = [System.Diagnostics.Process]::GetCurrentProcess().MainWindowHandle; [Win32.ConsoleUtils]::ShowWindow($consolePtr, 0)"', 
-            (error) => {
-                if (error) {
-                    console.log('控制台隐藏失败，请手动最小化窗口');
-                }
-            });
-        }
-    }, 2000); // 2秒后隐藏控制台
+    console.log(`服务器运行在端口 ${PORT}`);
 });

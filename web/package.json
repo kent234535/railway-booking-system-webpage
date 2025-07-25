@@ -4,9 +4,11 @@
   "description": "Web-based railway ticket booking system",
   "main": "server.js",
   "scripts": {
-    "start": "D:\\newdesktop\\desktopfilebodies\\nodejs\\node.exe server.js",
-    "start-hidden": "start /B D:\\newdesktop\\desktopfilebodies\\nodejs\\node.exe server.js",
-    "dev": "D:\\newdesktop\\desktopfilebodies\\nodejs\\node.exe node_modules\\nodemon\\bin\\nodemon.js server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "engines": {
+    "node": "18.x"
   },
   "dependencies": {
     "body-parser": "^1.20.2",
