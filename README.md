@@ -1,22 +1,25 @@
-# 🚄 Railway Booking System / 火车票预订系统
+# 🚄 Railway Ticket Booking System — Full-Stack Web App with Node.js, Express & SQLite
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Website-blue)](https://railway-booking-system-webpage.onrender.com/)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-green)](https://github.com/kent234535/railway-booking-system-webpage)
-[![Node.js](https://img.shields.io/badge/Node.js-18.x-green)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express-4.18.2-lightgrey)](https://expressjs.com/)
-[![SQLite](https://img.shields.io/badge/SQLite-Database-blue)](https://www.sqlite.org/)
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Visit_Website-blue?style=for-the-badge)](https://railway-booking-system-webpage.onrender.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-18.x-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-4.18.2-000000?logo=express&logoColor=white)](https://expressjs.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+> A **full-stack railway ticket booking web application** built with **Node.js**, **Express.js**, and **SQLite**. Features real Chinese railway station network data, bidirectional route search, real-time seat management, user auth, admin dashboard, and a responsive Bootstrap UI. **Deployed live on Render.**
 
 ## 🌐 Live Demo / 在线演示
 
-**Website / 网站地址**: [https://railway-booking-system-webpage.onrender.com/](https://railway-booking-system-webpage.onrender.com/)
+🔗 **Try it now**: [https://railway-booking-system-webpage.onrender.com/](https://railway-booking-system-webpage.onrender.com/)
 
 ## 📖 Description / 项目描述
 
 **English:**
-A comprehensive web-based railway ticket booking system built with Node.js, Express, and SQLite. This full-stack application provides a complete solution for train ticket management, including user registration, authentication, ticket searching, booking, and cancellation features.
+A comprehensive **full-stack web-based railway ticket booking system** built with **Node.js**, **Express.js**, and **SQLite**. This application provides a complete solution for train ticket management — including user registration, secure authentication, bidirectional route search across real Chinese railway networks, ticket booking & cancellation, balance management, and an admin dashboard for train service control.
 
 **中文:**
-基于 Node.js、Express 和 SQLite 构建的完整网络火车票预订系统。这个全栈应用程序提供了完整的火车票管理解决方案，包括用户注册、身份验证、车票查询、预订和取消等功能。
+基于 **Node.js**、**Express.js** 和 **SQLite** 构建的 **全栈火车票在线预订系统**。使用真实中国铁路站点网络数据，支持双向路线搜索、实时座位管理、用户注册与安全认证、车票预订与退票、余额管理，以及管理员后台列车调度控制。已部署至 Render 平台。
 
 ## ✨ Features / 功能特性
 
@@ -241,6 +244,12 @@ railway-booking-system-webpage/
 **English**: Thanks to all the open-source libraries and tools that made this project possible.
 
 **中文**: 感谢所有使这个项目成为可能的开源库和工具。
+
+---
+
+## 🏷️ Keywords / 关键词
+
+`railway booking system` · `train ticket` · `Node.js` · `Express.js` · `SQLite` · `full-stack` · `web application` · `REST API` · `Bootstrap` · `real-time seat management` · `火车票预订` · `全栈应用`
 
 ---
 
