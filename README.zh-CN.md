@@ -102,10 +102,23 @@ npm --version   # 8.x 或更高
 ```
 
 ### 安装与运行
+
+#### macOS / Linux
 ```bash
 git clone https://github.com/kent234535/railway-booking-system-webpage.git
 cd railway-booking-system-webpage/web
 npm install
+npm start
+```
+
+#### Windows
+
+> 🔑 如果 `npm install` 出现权限错误，请右键 **以管理员身份运行 PowerShell**。
+
+```powershell
+git clone https://github.com/kent234535/railway-booking-system-webpage.git
+cd railway-booking-system-webpage\web
+npm install      # 🔑 出现权限错误时需以管理员身份运行
 npm start
 ```
 

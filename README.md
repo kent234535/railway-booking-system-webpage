@@ -102,10 +102,23 @@ npm --version   # 8.x or higher
 ```
 
 ### Install & Run
+
+#### macOS / Linux
 ```bash
 git clone https://github.com/kent234535/railway-booking-system-webpage.git
 cd railway-booking-system-webpage/web
 npm install
+npm start
+```
+
+#### Windows
+
+> 🔑 If `npm install` fails with permission errors, run **PowerShell as Administrator**.
+
+```powershell
+git clone https://github.com/kent234535/railway-booking-system-webpage.git
+cd railway-booking-system-webpage\web
+npm install      # 🔑 may require Administrator if permission errors occur
 npm start
 ```
 
